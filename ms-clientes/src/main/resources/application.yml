@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/clientes}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/clientes?allowPublicKeyRetrieval=true&useSSL=false&connectTimeout=3000&socketTimeout=3000}
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:root}
   jpa:

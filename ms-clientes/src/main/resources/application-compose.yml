@@ -4,6 +4,7 @@ services:
   mysql:
     image: mysql:8.4
     container_name: db-mysql
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: clientes
       MYSQL_USER: appuser
@@ -16,25 +17,26 @@ services:
       "--collation-server=utf8mb4_unicode_ci"
     ]
     ports:
-      - "3306:3306"         # opcional: sólo si quieres acceder desde host
+      - "3306:3306"   # opcional: sólo si quieres acceder desde host
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./db/init:/docker-entrypoint-initdb.d  # .sql/.sh iniciales
+      - ./db/init:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uappuser", "-papppass"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 20
+      start_period: 20s
 
   ms-clientes:
     build:
       context: .
       dockerfile: Dockerfile
-    # O usa imagen si ya empacas el JAR en el pipeline
     # image: tu-usuario/ms-clientes:latest
+    restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: compose
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/clientes?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=America/Mexico_City
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/clientes?allowPublicKeyRetrieval=true&useSSL=false&connectionTimeZone=SERVER
       SPRING_DATASOURCE_USERNAME: appuser
       SPRING_DATASOURCE_PASSWORD: apppass
     depends_on:
