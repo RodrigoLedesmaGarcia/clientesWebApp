@@ -15,6 +15,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @EnabledIfEnvironmentVariable(named = "USE_TESTCONTAINERS", matches = "true")
 class MsClientesApplicationTests {
 
+
+    //
     static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.4")
             .withDatabaseName("clientes_test")
             .withUsername("testuser")
