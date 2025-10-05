@@ -1,7 +1,6 @@
 package com.spring.www.ms_clientes.services;
 
 import com.spring.www.ms_clientes.entity.Cliente;
-import org.apache.poi.sl.draw.geom.GuideIf;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
