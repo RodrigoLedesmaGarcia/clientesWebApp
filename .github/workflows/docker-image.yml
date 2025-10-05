@@ -8,12 +8,26 @@ on:
 
 env:
   IMAGE_NAME: my-spring-app
-  REGISTRY: ghcr.io  # GitHub Container Registry
+  REGISTRY: ghcr.io
 
 jobs:
   test:
     runs-on: ubuntu-latest
     
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: 12345
+          MYSQL_DATABASE: clientes_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
     - uses: actions/checkout@v4
     
@@ -24,8 +38,20 @@ jobs:
         distribution: 'temurin'
         cache: 'maven'
     
+    - name: Wait for MySQL to be ready
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mysql-client
+        while ! mysqladmin ping -h"127.0.0.1" -P3306 -uroot -p12345 --silent; do
+          sleep 1
+        done
+    
     - name: Run tests
       run: mvn clean test
+      env:
+        SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/clientes_db?useSSL=false&serverTimezone=UTC
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: 12345
 
   build:
     needs: test
@@ -58,17 +84,21 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}
+        images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
         tags: |
           type=ref,event=branch
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable={{is_default_branch}}
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix=
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
     
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
         context: .
-        push: true
+        file: ./Dockerfile
+        push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
@@ -85,6 +115,9 @@ jobs:
     
     - name: Deploy to environment
       run: |
-        echo "Deploying application..."
-        # Aquí agregas tus comandos de despliegue
-        # Por ejemplo: kubectl, docker-compose, etc.
+        echo "Deploying application ${{ env.IMAGE_NAME }}"
+        echo "Image: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest"
+        # Add your deployment commands here
+        # Examples:
+        # - kubectl set image deployment/my-app app=${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+        # - docker-compose pull && docker-compose up -d
