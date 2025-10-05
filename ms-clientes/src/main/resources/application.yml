@@ -1,20 +1,13 @@
 spring:
-  application:
-    name: ms-clientes
   datasource:
-    url: jdbc:mysql://host.docker.internal:3306/clientes_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: 12345
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/clientes}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
   jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
-    generate-ddl: true
-
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  jackson:
+    time-zone: America/Mexico_City
 server:
-  port: 8030
-
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: debug
+  port: ${SERVER_PORT:8080}
