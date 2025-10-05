@@ -93,7 +93,4 @@ public class ClienteFotoController {
                         "inline; filename=\"" + (c.getFotoNombre() == null ? "foto" : c.getFotoNombre()) + "\"")
                 .body(data);
     }
-
-
-
-}
+} // fin
