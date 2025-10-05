@@ -1,6 +1,7 @@
 package com.spring.www.ms_clientes.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -42,9 +43,53 @@ public class Cliente {
 
     @Lob @Basic(fetch = FetchType.LAZY)
     @Column(columnDefinition = "LONGBLOB")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private byte[] pdfDatos;
 
 
+    private String fotoNombre;
+    private String fotoTipo;
+    private Long   fotoTamano;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(columnDefinition = "LONGBLOB")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private byte[] fotoDatos;
+
+    public String getFotoNombre() {
+        return fotoNombre;
+    }
+
+    public void setFotoNombre(String fotoNombre) {
+        this.fotoNombre = fotoNombre;
+    }
+
+    public String getFotoTipo() {
+        return fotoTipo;
+    }
+
+    public void setFotoTipo(String fotoTipo) {
+        this.fotoTipo = fotoTipo;
+    }
+
+    public Long getFotoTamano() {
+        return fotoTamano;
+    }
+
+    public void setFotoTamano(Long fotoTamano) {
+        this.fotoTamano = fotoTamano;
+    }
+
+    public byte[] getFotoDatos() {
+        return fotoDatos;
+    }
+
+    public void setFotoDatos(byte[] fotoDatos) {
+        this.fotoDatos = fotoDatos;
+    }
+
+    /* ****************** LOS GETTER & SETTER ******************* */
     public Long getId() {
         return id;
     }
